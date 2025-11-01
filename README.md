@@ -1,16 +1,99 @@
-# React + Vite
+# Assignment #2: Drone Dashboard (Frontend - React Version)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+นี่คือโปรเจกต์ Frontend (หน้าร้าน) สำหรับ Assignment #2 ที่สร้างขึ้นใหม่ (Refactor) ด้วย **React.js** และ **Vite** เพื่อให้ตรงตามข้อกำหนดของโจทย์ (โดยเฉพาะเรื่อง `.env`)
 
-Currently, two official plugins are available:
+## 🌐 หน้าเว็บ (Live URL)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**[https://g7tuesm.consolutechcloud.com/](https://g7tuesm.consolutechcloud.com/)**
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Features (3 หน้า)
 
-## Expanding the ESLint configuration
+โปรเจกต์นี้ใช้ `react-router-dom` เพื่อจัดการ Single Page Application (SPA) โดยมี 3 หน้าหลัก:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Page #1: View Config (`/`)
+* แสดงข้อมูล Config (ID, Name, Light, Country) ของโดรนประจำตัว
+* ข้อมูลนี้ถูกดึงโดย `App.jsx` (Layout หลัก) เพียง **ครั้งเดียว** แล้วเก็บไว้ใน **React Context** (กล่องเก็บของส่วนกลาง)
+* หน้านี้จะ "หยิบ" ข้อมูลจาก Context มาแสดงผล
+
+### 2. Page #2: Log Form (`/form`)
+* เป็นฟอร์มสำหรับกรอกอุณหภูมิ (Celsius)
+* หน้านี้จะ "หยิบ" Config (Name, Country) จาก Context มาใช้ทันที (ไม่ต้องโหลดซ้ำ)
+* เมื่อกด Submit, จะ `POST` ข้อมูล 4 field (drone\_id, drone\_name, country, celsius) ไปที่ `POST /api/logs`
+
+### 3. Page #3: View Logs (`/logs`)
+* แสดงประวัติ Log 12 รายการล่าสุดในรูปแบบตาราง `<table>`
+* รองรับ Pagination (ปุ่ม Next/Previous) โดยการเปลี่ยน State ของ `page` ซึ่งจะกระตุ้นให้ `useEffect` ทำงานใหม่ (Fetch API ซ้ำ)
+
+---
+
+## 🏛️ สถาปัตยกรรม (ตรงตามโจทย์ 100%)
+
+โปรเจกต์นี้ออกแบบมาเพื่อแก้ปัญหาที่พบในเวอร์ชัน HTML พื้นฐาน:
+
+* **Environment Variables:** เราใช้ไฟล์ `.env` เพื่อเก็บ `VITE_DRONE_ID` และ `VITE_API_URL` ไฟล์นี้จะไม่ถูก Push ขึ้น GitHub (ตาม `.gitignore` ที่ Vite สร้างให้)
+* **No Hardcoded ID:** ในโค้ด เราเรียกใช้ `import.meta.env.VITE_DRONE_ID` ทำให้ไม่มีเลข ID ฝังในโค้ดที่ Push ขึ้น GitHub
+* **State Management:** เราใช้ **React Context** (`ConfigContext`) เพื่อเป็น "ที่เก็บข้อมูลส่วนกลาง" (`App.jsx` โหลด Config ครั้งเดียว แล้ว Page #1 และ #2 หยิบไปใช้) ซึ่งมีประสิทธิภาพกว่าการโหลดซ้ำทุกหน้า
+* **Components:** เราใช้ "Layout" (`App.jsx`) ที่มี `<Outlet />` ทำให้มีเมนู `<nav>` **เพียงที่เดียว** ไม่ต้อง Copy/Paste โค้ดซ้ำซ้อน
+
+---
+
+## 🚀 วิธีการ Run (สำหรับทดสอบในเครื่อง)
+
+### 1. รัน Backend (Ass#1)
+คุณต้องรัน Server ของ Assignment #1 (ที่ `localhost:1600`) ก่อน
+
+```bash
+# เปิด Terminal 1
+cd ../Wen_nodejs
+node index.js
+```
+
+### 2. รัน Frontend (Ass#2 - React)
+โปรเจกต์นี้ใช้ Vite ซึ่งมี Proxy Server สำหรับการพัฒนา
+
+
+#### เปิด Terminal 2
+cd /path/to/Web_react_frontend
+
+##### 1. (ทำครั้งแรก) ติดตั้งเครื่องมือ
+```bash
+npm install
+```
+##### 2. สร้างไฟล์ .env (ถ้ายังไม่มี)
+```bash
+# (เนื้อหาไฟล์ .env)
+# VITE_DRONE_ID=66010296
+# VITE_API_URL=/api
+```
+##### 3. รัน Server ทดสอบ (ที่ localhost:5173)
+```bash
+npm run dev
+vite.config.js ในโปรเจกต์นี้ ถูกตั้งค่าให้ "Proxy" (ส่งต่อ) Request ที่ไป /api... ไปยัง Backend ที่ http://localhost:1600 ให้แล้ว
+```
+
+## 📦 วิธีการ Deploy (สำหรับขึ้น Server จริง)
+โปรเจกต์ React ห้าม อัปโหลด Source Code (src/, vite.config.js) ขึ้น public_html ตรงๆ
+
+คุณต้อง "Build" (สร้าง) โปรเจกต์ก่อน:
+
+### 1. Build (ทำบนเครื่อง PC)
+รันคำสั่งนี้ใน Terminal (ที่ Web_react_frontend):
+
+```bash
+npm run build
+คำสั่งนี้จะอ่าน .env และ "สร้าง" เว็บไซต์เวอร์ชันสมบูรณ์ (HTML/CSS/JS ธรรมดา) ไปไว้ในโฟลเดอร์ใหม่ชื่อ dist
+```
+### 2. Upload (จาก PC ไป Server)
+(บน Server) ล้างไฟล์เก่าใน ~/public_html ทิ้งให้หมด (ยกเว้น .htaccess!)
+
+(บน PC) อัปโหลด "ทุกอย่างที่อยู่ข้างใน" โฟลเดอร์ dist
+
+(ไปยัง Server) วางไฟล์เหล่านั้นลงใน ~/public_html
+
+### 3. การทำงานบน Server
+Backend (Ass#1): รันด้วย pm2 ที่ Port 1600 
+![PM2](./assets/pm2.png)
+Apache (.htaccess): ไฟล์ .htaccess (Reverse Proxy) ที่อยู่ใน public_html จะ "ดัก" Request (/api) ที่มาจาก React (ไฟล์ใน dist/) แล้วส่งต่อไปให้ Port 1600 โดยอัตโนมัติ
+![PM2](./assets/pm2.log.png)
